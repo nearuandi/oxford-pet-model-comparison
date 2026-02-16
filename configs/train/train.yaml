@@ -1,0 +1,17 @@
+num_epochs: 30
+batch_size: 64
+num_workers: 2
+pin_memory: true
+amp: true
+drop_last: true
+
+optimizer:
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+
+scheduler:
+  mode: min
+  factor: 0.5
+  patience: 3
+  min_lr: 1.0e-6

@@ -1,0 +1,4 @@
+name: ${model.name}_freeze
+
+model:
+  freeze_backbone: true

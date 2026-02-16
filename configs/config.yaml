@@ -1,0 +1,20 @@
+defaults:
+  - paths: paths
+  - dataset: oxford_pet
+  - train: train
+  - exp: base
+  - model: resnet18
+  - _self_
+
+seed: 42
+
+hydra:
+  # 한번
+  run:
+    dir: runs/${exp.name}
+  # 여러번
+  sweep:
+    dir: runs
+    subdir: ${exp.name}
+
+# ${hydra.job.override_dirname}
