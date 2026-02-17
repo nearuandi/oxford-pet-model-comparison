@@ -1,7 +1,4 @@
-from pathlib import Path
-
 import torch
-from hydra.utils import to_absolute_path
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader, Subset
 
@@ -15,7 +12,6 @@ def build_dataloaders(
     dataset = cfg.dataset
     train = cfg.train
 
-    #data_root = Path(to_absolute_path(dataset.root))
     data_root = dataset.root
 
     download = dataset.download
