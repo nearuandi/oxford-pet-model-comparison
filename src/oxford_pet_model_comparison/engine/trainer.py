@@ -1,5 +1,4 @@
 import time
-from dataclasses import dataclass
 from pathlib import Path
 
 import torch
@@ -14,14 +13,6 @@ from .loops.evaluate_one_epoch import evaluate_one_epoch
 from .checkpoint import save_best, save_history
 
 
-@dataclass(slots=True)
-class TrainState:
-    model: nn.Module
-    optimizer: Optimizer
-    scaler: GradScaler | None
-    scheduler: ReduceLROnPlateau | None
-
-
 class Trainer:
     def __init__(
         self,
@@ -32,31 +23,12 @@ class Trainer:
         scaler: GradScaler | None = None,
         scheduler: ReduceLROnPlateau | None = None
     ) -> None:
+        self.model = model.to(device)
+        self.loss_fn = loss_fn
         self.device = device
-        self.loss_fn = loss_fn.to(device)
-
-        self.state = TrainState(
-            model=model.to(device),
-            optimizer=optimizer,
-            scaler=scaler,
-            scheduler=scheduler,
-        )
-
-    @property
-    def model(self) -> nn.Module:
-        return self.state.model
-
-    @property
-    def optimizer(self) -> Optimizer:
-        return self.state.optimizer
-
-    @property
-    def scaler(self) -> GradScaler | None:
-        return self.state.scaler
-
-    @property
-    def scheduler(self) -> ReduceLROnPlateau | None:
-        return self.state.scheduler
+        self.optimizer = optimizer
+        self.scaler = scaler
+        self.scheduler = scheduler
 
     def fit(
         self,
