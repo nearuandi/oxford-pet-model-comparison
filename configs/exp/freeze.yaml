@@ -1,4 +1,6 @@
-name: ${model.name}_freeze
+# @package _global_
+exp:
+  name: ${model.name}_freeze
 
 model:
   freeze_backbone: true
