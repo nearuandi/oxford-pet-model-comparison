@@ -2,7 +2,7 @@ defaults:
   - paths: paths
   - dataset: oxford_pet
   - train: train
-  - model: resnet18
+  - model: mobilenet_v2
   - exp: base
   - _self_
 
