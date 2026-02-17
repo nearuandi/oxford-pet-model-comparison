@@ -15,19 +15,13 @@ def build_dataloaders(
     dataset = cfg.dataset
     train = cfg.train
 
-    data_root = Path(to_absolute_path(dataset.root))
-    print(f"dataroot = {data_root}")
+    #data_root = Path(to_absolute_path(dataset.root))
+    data_root = dataset.root
 
     download = dataset.download
 
     train_ratio = dataset.train_ratio
     seed = cfg.seed
-
-    batch_size = train.batch_size
-    num_workers = train.num_workers
-    pin_memory = train.pin_memory
-    drop_last = train.drop_last
-    persistent_workers = (num_workers > 0)
 
     train_transform, eval_transform = build_transforms()
 
@@ -74,30 +68,30 @@ def build_dataloaders(
 
     train_loader = DataLoader(
         train_ds,
-        batch_size=batch_size,
+        batch_size=train.batch_size,
         shuffle=True,
         generator=dl_g,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        persistent_workers=persistent_workers,
-        drop_last=drop_last
+        num_workers=train.num_workers,
+        pin_memory=train.pin_memory,
+        persistent_workers=train.persistent_workers,
+        drop_last=train.drop_last,
     )
     val_loader = DataLoader(
         val_ds,
-        batch_size=batch_size,
+        batch_size=train.batch_size,
         shuffle=False,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        persistent_workers=persistent_workers,
+        num_workers=train.num_workers,
+        pin_memory=train.pin_memory,
+        persistent_workers=train.persistent_workers,
         drop_last=False
     )
     test_loader = DataLoader(
         test_ds,
-        batch_size=batch_size,
+        batch_size=train.batch_size,
         shuffle=False,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        persistent_workers=persistent_workers,
+        num_workers=train.num_workers,
+        pin_memory=train.pin_memory,
+        persistent_workers=train.persistent_workers,
         drop_last=False
     )
 
