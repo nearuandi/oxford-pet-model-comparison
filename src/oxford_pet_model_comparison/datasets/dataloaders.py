@@ -19,7 +19,7 @@ def build_dataloaders(
     train_ratio = dataset.train_ratio
     seed = cfg.seed
 
-    train_transform, eval_transform = build_transforms()
+    train_transform, eval_transform = build_transforms(cfg)
 
     base_ds = OxfordPetDataset(
         root=data_root,

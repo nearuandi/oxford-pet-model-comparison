@@ -31,7 +31,7 @@ def main(cfg: DictConfig):
 
     url = "https://bowwowinsurance.com.au/wp-content/uploads/2020/09/shutterstock_48271828-keeshond-thumbnail.jpg"
 
-    _, eval_transform, = build_transforms()
+    _, eval_transform, = build_transforms(cfg)
     img = make_batch_image_from_url(
         url=url, transform=eval_transform
     )
