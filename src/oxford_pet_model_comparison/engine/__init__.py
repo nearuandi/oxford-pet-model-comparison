@@ -1,9 +1,8 @@
-from .evaluate_one_epoch import evaluate_one_epoch
-from .fit import fit
-from .factories import build_training_components
+from .trainer import Trainer
+from .factories import build_training_components, TrainingComponents
 
 __all__ = [
-    "evaluate_one_epoch",
-    "fit",
-    "build_training_components"
+    "Trainer",
+    "build_training_components",
+    "TrainingComponents"
 ]
