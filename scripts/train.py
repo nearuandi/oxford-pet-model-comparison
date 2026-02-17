@@ -45,7 +45,7 @@ def run_one_exp(
 
     components = build_training_components(
         model=model,
-        train=cfg.train,
+        cfg=cfg,
         device=device,
     )
 
