@@ -1,4 +1,0 @@
-name: ${model.name}_finetune
-
-model:
-  freeze_backbone: false
