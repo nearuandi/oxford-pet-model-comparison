@@ -40,10 +40,10 @@ def evaluate_one_epoch(
         num_correct += preds.eq(labels).sum().item()
         num_samples += batch_size
 
-    val_loss = running_loss / max(num_samples, 1)
-    val_acc = 100.0 * num_correct / max(num_samples, 1)
+    epoch_loss = running_loss / max(num_samples, 1)
+    epoch_acc = 100.0 * num_correct / max(num_samples, 1)
 
-    return val_loss, val_acc
+    return epoch_loss, epoch_acc
 
 
 @torch.no_grad()
