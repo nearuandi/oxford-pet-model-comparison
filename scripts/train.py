@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import hydra
-from hydra.core.hydra_config import HydraConfig
+from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
 from omegaconf import OmegaConf
 
@@ -17,13 +17,13 @@ def run_one_exp(
         cfg: DictConfig,
         device: torch.device
 ) -> None:
-
-    runs_dir = Path(cfg.paths.runs_dir)
+    runs_dir = Path(get_original_cwd()) / cfg.paths.runs_dir
+    run_dir = runs_dir / cfg.exp.name
 
     exp_name = cfg.exp.name
 
-    run_dir = runs_dir / exp_name
     run_dir.mkdir(exist_ok=True, parents=True)
+
     OmegaConf.save(cfg, run_dir / "config.yaml")
 
 
@@ -72,6 +72,7 @@ def main(
         cfg: DictConfig
 ) -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"train device: {device}")
     print(f"RUN: {cfg.exp.name}")
     run_one_exp(cfg, device=device)
 
