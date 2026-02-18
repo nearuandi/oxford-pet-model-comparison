@@ -32,9 +32,9 @@ out/
       ├── history.pt
       └── config.yaml
 ```
-best.pt : validation accuracy 기준 최고 성능 모델
-history.pt : epoch별 학습 기록
-config.yaml : 실행 시 사용된 Hydra 설정
+- best.pt : validation accuracy 기준 최고 성능 모델
+- history.pt : epoch별 학습 기록
+- config.yaml : 실행 시 사용된 Hydra 설정
 
 ## Evaluate (scripts/test.py)  
 ```bash
