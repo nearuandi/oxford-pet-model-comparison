@@ -17,15 +17,16 @@ class Predictor:
         self.cfg = cfg
         self.device = device
 
-        # dict 형태로 저장했으니까
+        # dict 형태로 저장했으니까 weights_only=False
         payload = torch.load(best_path, map_location=device, weights_only=False)
 
         self.model = build_model(
             model_name=cfg.model.name,
             num_classes=cfg.dataset.num_classes,
-            pretrained=cfg.model.pretrained,
-            freeze_backbone=cfg.model.freeze_backbone
-        ).to(device)
+            pretrained=False,
+            freeze_backbone=False
+        )
+        self.model.to(self.device)
 
         self.model.load_state_dict(payload["model_state_dict"])
         self.model.eval()
