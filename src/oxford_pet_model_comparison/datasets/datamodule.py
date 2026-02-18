@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
-
 import torch
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader, Subset
 
-from .oxford_pet_dataset import OxfordPetDataset
 from .transforms import build_train_transform, build_eval_transform
+from .oxford_pet_dataset import OxfordPetDataset
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,9 +19,11 @@ def split_indices(
         train_ratio: float,
         seed: int
 ) -> tuple[list[int], list[int]]:
+
     train_size = int(n * train_ratio)
     g = torch.Generator().manual_seed(seed)
     perm = torch.randperm(n, generator=g).tolist()
+
     return perm[:train_size], perm[train_size:]
 
 
@@ -30,46 +31,44 @@ def build_datamodule(cfg: DictConfig) -> DataModule:
     dataset = cfg.dataset
     train = cfg.train
 
-    data_root = Path(dataset.root)
-
     seed = train.seed
 
     train_transform = build_train_transform(cfg)
     eval_transform = build_eval_transform(cfg)
 
-    base_ds = OxfordPetDataset(
-        root=data_root,
+    base_dataset = OxfordPetDataset(
+        root=dataset.root,
         split="trainval",
         transform=None,
         download=False,
     )
 
     train_idx, val_idx = split_indices(
-        n=len(base_ds),
+        n=len(base_dataset),
         train_ratio=dataset.train_ratio,
         seed=seed
     )
 
-    train_ds_full = OxfordPetDataset(
-        root=data_root,
+    train_full = OxfordPetDataset(
+        root=dataset.root,
         split="trainval",
         transform=train_transform,
         download=False,
     )
-    val_ds_full = OxfordPetDataset(
-        root=data_root,
+    val_full = OxfordPetDataset(
+        root=dataset.root,
         split="trainval",
         transform=eval_transform,
         download=False,
     )
 
-    train_ds = Subset(train_ds_full, train_idx)
-    val_ds = Subset(val_ds_full, val_idx)
+    train_dataset = Subset(train_full, train_idx)
+    val_dataset = Subset(val_full, val_idx)
 
     g = torch.Generator().manual_seed(seed)
 
     train_loader = DataLoader(
-        train_ds,
+        dataset=train_dataset,
         batch_size=train.batch_size,
         shuffle=True,
         generator=g,
@@ -79,7 +78,7 @@ def build_datamodule(cfg: DictConfig) -> DataModule:
         drop_last=train.drop_last
     )
     val_loader = DataLoader(
-        val_ds,
+        dataset=val_dataset,
         batch_size=train.batch_size,
         shuffle=False,
         num_workers=train.num_workers,
