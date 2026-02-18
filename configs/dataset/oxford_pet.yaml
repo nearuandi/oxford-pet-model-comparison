@@ -1,12 +1,11 @@
 name: oxford_pet
 root: data
-download: false
 train_ratio: 0.9
 num_classes: 37
 
 image_size: 224
-image_mean: [0.485, 0.456, 0.406]
-image_std:  [0.229, 0.224, 0.225]
+mean: [0.485, 0.456, 0.406]
+std:  [0.229, 0.224, 0.225]
 
 class_names:
   - Abyssinian
