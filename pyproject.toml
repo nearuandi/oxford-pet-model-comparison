@@ -1,6 +1,18 @@
 [project]
 name = "oxford-pet-model-comparison"
 version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+  "torch",
+  "torchvision",
+  "hydra-core",
+  "omegaconf",
+  "pillow",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
