@@ -12,15 +12,18 @@ def run_eval(cfg) -> None:
     out_dir = Path(cfg.paths.out_dir) / cfg.exp.name
     best_path = out_dir / "best.pt"
 
-    # dict 형태로 저장했으니까
+    # dict 형태로 저장했으니까 weights_only=False
     payload = torch.load(best_path, map_location=device, weights_only=False)
 
     # 이미 trained weight 있어서 pretrained 의미 없음
     # freeze 는 학습할때만 필요
     model = build_model(
         model_name=cfg.model.name,
-        num_classes=cfg.dataset.num_classes
-    ).to(device)
+        num_classes=cfg.dataset.num_classes,
+        pretrained=False,
+        freeze_backbone=False
+    )
+    model.to(device)
 
     model.load_state_dict(payload["model_state_dict"])
 
@@ -35,5 +38,5 @@ def run_eval(cfg) -> None:
             loss_fn=loss_fn,
             device=device
         )
-    print(f"exp.name= {cfg.exp.name}")
+    print(f"cfg.exp.name= {cfg.exp.name}")
     print(f"val_loss={val_loss:.4f} | val_acc={val_acc:.2f}%")
