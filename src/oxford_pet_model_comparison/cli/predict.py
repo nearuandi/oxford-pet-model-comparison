@@ -9,7 +9,7 @@ def run_predict(cfg) -> None:
     out_dir = Path(cfg.paths.out_dir) / cfg.exp.name
     best_path = out_dir / "best.pt"
 
-    image_path = Path(cfg.image_path)
+    image_path = cfg.image_path
 
     predictor = Predictor(cfg, best_path=best_path, device=device)
     result = predictor.predict(image_path_or_url=image_path)
