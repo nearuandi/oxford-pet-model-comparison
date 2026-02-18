@@ -1,9 +1,10 @@
 # oxford-pet-model-comparison
-Oxford-IIIT Pet Dataset을 기반으로 Hydra 설정을 통해 다양한 실험(exp)을 구성하고 여러 CNN 모델(SimpleCNN, MobileNetV2, ResNet18, EfficientNet-B0)의 학습 파이프라인을 관리하기 위한 프로젝트입니다.  
-학습 파이프라인은 재현성과 유지보수성을 고려하여 datasets / engine / models 구조로 분리하였으며, Hydra 기반 설정 관리 시스템을 적용했습니다.
+Oxford-IIIT Pet Dataset을 사용하여 여러 CNN 백본(SimpleCNN, MobileNetV2, ResNet18, EfficientNet-B0)을 동일한 학습 파이프라인에서 비교하기 위한 프로젝트입니다.  
+Hydra 기반 설정 관리를 적용하여 코드 수정 없이 다양한 실험을 실행할 수 있도록 구성했습니다.  
+데이터 로딩, 모델 생성, 학습 루프, 추론 로직을 분리하여 재현성과 유지보수성을 고려했습니다.
 
 ## Installation
-현재 프로젝트를 editable 모드로 설치하여 코드 수정 시 재설치 없이 바로 반영됩니다.
+editable 모드로 설치하면 코드 수정 시 재설치 없이 바로 반영됩니다.
 ```bash
 pip install -e .
 ```
@@ -11,140 +12,170 @@ pip install -e .
 ## Data Setup
 ```bash
 kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset
-Expand-Archive the-oxfordiiit-pet-dataset.zip -DestinationPath data/oxford-iiit-pet
+Expand-Archive the-oxfordiiit-pet-dataset.zip -DestinationPath datasets/oxford-iiit-pet
 ```
+경로는 configs/dataset/oxford_pet.yaml에서 변경할 수 있습니다.
 
 ## Train (scripts/train.py)  
-모델 학습을 실행합니다.  
-Hydra CLI override를 통해 다양한 모델 및 실험 설정으로 학습을 수행할 수 있습니다.
+Hydra CLI override를 통해 다양한 모델 및 실험 설정으로 학습을 실행할 수 있습니다.
 ```bash
 python scripts/train.py -m model=resnet18,mobilenet_v2,efficientnet_b0,simple_cnn
-python scripts/train.py -m model=resnet18 exp=freeze
+python scripts/train.py model=resnet18 exp=freeze
 ```
 
 ## Output
-각 실험 결과는 runs/ 폴더 아래에 저장되며, validation accuracy 기준으로 가장 성능이 높은 모델과 학습 기록, 그리고 실험 재현을 위한 설정이 함께 보관됩니다.
+실험 결과는 out/ 폴더 아래에 저장됩니다.
 ```text
-runs/
+out/
  └── <exp_name>/
       ├── best.pt
       ├── history.pt
       └── config.yaml
 ```
+best.pt : validation accuracy 기준 최고 성능 모델
+history.pt : epoch별 학습 기록
+config.yaml : 실행 시 사용된 Hydra 설정
 
-## Test (scripts/test.py)  
-저장된 best 모델을 로드한 뒤 test_loader를 사용하여 최종 테스트 성능을 평가합니다.
-
-## Visualize (scripts/visualize.py)  
-학습 과정에서 저장된 history를 기반으로 다음 그래프를 출력합니다. 
-- Train / Validation Loss
-- Train / Validation Accuracy
-- Best Validation Accuracy
-
-여러 모델(SimpleCNN, MobileNetV2, ResNet18, EfficientNetB0)의 Validation 성능 곡선 비교도 가능합니다.  
-특정 실험(exp)의 결과를 시각화하려면 Hydra CLI override를 사용합니다.
+## Evaluate (scripts/test.py)  
 ```bash
-python scripts/visualize.py model=resnet18 exp=freeze 
+python scripts/evaluate.py model=resnet18 exp=freeze                                      
+```
+
+## Predict (scripts/predict.py) 
+로컬 이미지
+```bash
+python scripts/predict.py image_path="sample.jpg" model=resnet18 exp=freeze
+```
+URL 이미지
+```bash
+python scripts/predict.py image_path="https://cdn.britannica.com/16/234216-050-C66F8665/beagle-hound-dog.jpg" model=resnet18 exp=freeze
 ```
 
 ## Hydra 기반 설정 관리
 실험 설정은 Hydra를 사용하여 YAML 파일로 분리 관리합니다.
-
-- dataset / model / train / exp 설정을 개별 파일로 구성
-- CLI override를 통해 다양한 실험 설정을 유연하게 변경 가능
-- 코드 수정 없이 YAML 및 CLI만으로 실험 조건 제어
-- 실행 시 사용된 설정(config.yaml)은 runs 폴더에 자동 저장되어 실험 재현성을 보장합니다.
+- dataset / model / train / exp 설정 분리
+- CLI override로 실험 조건 변경 가능
+- 실행 시 최종 config 자동 저장
 
 ## Engineering Design
-여러 모델을 동일한 조건에서 비교하기 위해 공통 학습 루프를 중심으로 구조를 설계했습니다.  
-- 모델 생성은 build_model()에서 관리
-- training components는 factory에서 생성
-- train/evaluate loop 분리
-
-datasets / engine / models 역할을 나누어 코드 가독성과 유지보수성을 고려했습니다.  
-Hydra를 사용하여 실험 설정을 코드에서 분리하고, 재현 가능한 실험 구조를 구성했습니다.
+여러 모델을 동일한 조건에서 비교할 수 있도록 공통 학습 파이프라인을 중심으로 구조를 설계했습니다.
+- build_model()을 통해 모델 생성 관리
+- training components는 factory 패턴으로 구성
+- train / evaluate loop 분리
+- Predictor 클래스로 inference 로직 독립
 
 ## Models
 현재 구현된 모델:
 - SimpleCNN
 - MobileNetV2
-- ResNet18
 - EfficientNetB0
-
-새로운 모델을 추가할 경우, model_factory에만 등록하면 학습 코드 수정 없이 확장 가능합니다.
+- ResNet18
+새 모델 추가 시 models/registry.py에만 등록하면 됩니다.
 
 ## Project Structure  
 ```text
-oxford-pet-model-comparison
-├─ configs
-│  ├─ dataset
-│  │  └─ oxford_pet.yaml
-│  ├─ exp
-│  │  ├─ base.yaml
-│  │  └─ freeze.yaml
-│  ├─ model
-│  │  ├─ efficientnet_b0.yaml
-│  │  ├─ mobilenet_v2.yaml
-│  │  ├─ resnet18.yaml
-│  │  └─ simple_cnn.yaml
-│  ├─ paths
-│  │  └─ paths.yaml
-│  ├─ train
-│  │  └─ train.yaml
-│  └─ config.yaml
+oxford-pet-model-comparison/
+├─ configs/                      # Hydra 설정들
+│  ├─ config.yaml                # 엔트리(기본) config
+│  ├─ paths/
+│  │  └─ paths.yaml              # data/out 경로 모음
+│  ├─ dataset/
+│  │  └─ oxford_pet.yaml         # 데이터셋 설정 (num_classes 등)
+│  ├─ train/
+│  │  └─ train.yaml              # 학습 하이퍼파라미터
+│  ├─ exp/
+│  │  ├─ base.yaml               # 기본 실험
+│  │  └─ freeze.yaml             # freeze_backbone 실험 등
+│  └─ model/
+│     ├─ simple_cnn.yaml
+│     ├─ mobilenet_v2.yaml
+│     ├─ resnet18.yaml
+│     └─ efficientnet_b0.yaml
 │
-├─ data
-├─ multirun
-├─ outputs
-├─ runs
-│
-├─ scripts
+├─ scripts/                      # 실행 스크립트(진입점)
 │  ├─ train.py
-│  ├─ test.py
-│  ├─ predict.py
-│  └─ visualize.py
+│  ├─ evaluate.py
+│  └─ predict.py
 │
-├─ src
-│  └─ oxford_pet_model_comparison
-│     ├─ datasets
-│     │  ├─ __init__.py
-│     │  ├─ dataloaders.py
-│     │  ├─ oxford_pet_dataset.py
-│     │  └─ transforms.py
-│     │
-│     ├─ engine
-│     │  ├─ __init__.py
-│     │  ├─ trainer.py
-│     │  ├─ checkpoint
-│     │  │  ├─ __init__.py
-│     │  │  ├─ save.py
-│     │  │  └─ load.py
-│     │  ├─ factories
-│     │  │  ├─ __init__.py
-│     │  │  └─ training_factory.py
-│     │  └─ loops
-│     │     ├─ __init__.py
-│     │     ├─ train_one_epoch.py
-│     │     └─ evaluate_one_epoch.py
-│     │
-│     ├─ models
-│     │  ├─ __init__.py
-│     │  ├─ model_factory.py
-│     │  ├─ resnet18.py
-│     │  ├─ mobilenet_v2.py
-│     │  ├─ efficientnet_b0.py
-│     │  └─ simple_cnn.py
-│     │
-│     ├─ utils
-│     │  ├─ __init__.py
-│     │  └─ image_utils.py
-│     │
-│     └─ visualize
-│        ├─ __init__.py
-│        └─ plots.py
+├─ src/oxford_pet_model_comparison/
+│  ├─ cli/                       # CLI 실행 로직 (run_train/run_eval/run_predict)
+│  │  ├─ __init__.py
+│  │  ├─ train.py
+│  │  ├─ evaluate.py
+│  │  └─ predict.py
+│  │
+│  ├─ datasets/                  # dataset / datamodule / transforms
+│  │  ├─ __init__.py
+│  │  ├─ oxford_pet_dataset.py
+│  │  ├─ datamodule.py
+│  │  └─ transforms.py
+│  │
+│  ├─ models/                    # 모델 구현 + registry/build
+│  │  ├─ __init__.py
+│  │  ├─ registry.py
+│  │  ├─ simple_cnn.py
+│  │  ├─ mobilenet_v2.py
+│  │  ├─ resnet18.py
+│  │  └─ efficientnet_b0.py
+│  │
+│  ├─ training/                  # 학습 루프/트레이너
+│  │  ├─ __init__.py
+│  │  ├─ trainer.py
+│  │  └─ loops/
+│  │     ├─ __init__.py
+│  │     ├─ train_one_epoch.py
+│  │     └─ evaluate_one_epoch.py
+│  │
+│  ├─ inference/                 # 추론
+│  │  ├─ __init__.py
+│  │  └─ predictor.py
+│  │
+│  └─ utils/                     # seed, I/O, 이미지 로딩 등
+│     ├─ __init__.py
+│     ├─ seed.py
+│     ├─ io.py
+│     └─ image_utils.py
 │
+├─ data/                         # (로컬) 데이터 위치
+├─ out/                          # 실험 결과 저장 폴더
+├─ outputs/                      # hydra 기본 출력 폴더
 ├─ pyproject.toml
-├─ LICENSE
-├─ README.md
-└─ .gitignore
+└─ README.md
+```
+# Architecture Overview
+```text
+configs/ (Hydra)
+       ↓
+scripts/train.py
+       ↓
+datasets/ → models/ → training/
+       ↓
+out/<exp_name>/
+```
+
+# Training Flow
+```text
+Hydra Config
+     ↓
+build_datamodule()
+     ↓
+build_model()
+     ↓
+Trainer.fit()
+     ↓
+train_one_epoch / evaluate_one_epoch
+     ↓
+Checkpoint Save
+```
+# Inference Flow
+```text
+predict.py
+     ↓
+Load best.pt
+     ↓
+build_model()
+     ↓
+Predictor.predict()
+     ↓
+Softmax → class_name / probability
 ```
