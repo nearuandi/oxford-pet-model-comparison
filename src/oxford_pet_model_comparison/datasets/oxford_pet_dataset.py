@@ -12,7 +12,7 @@ class OxfordPetDataset(Dataset):
             root: str | Path,
             split: str,
             transform: Callable | None,
-            download: bool = True
+            download: False
     ) -> None:
         super().__init__()
         self.root = Path(root)
@@ -27,6 +27,7 @@ class OxfordPetDataset(Dataset):
 
     def __len__(self) -> int:
         return len(self.dataset)
+
     def __getitem__(self, idx) -> dict[str, Tensor]:
         image, label = self.dataset[idx]
 
