@@ -25,7 +25,7 @@ def save_best(
 ) -> None:
     out_dir = Path(out_dir)
     best = {
-        "loops": epoch,
+        "epoch": epoch,
         "model_state_dict": model.state_dict(),
         "best_val_acc": best_val_acc,
         "exp_name": exp_name,
