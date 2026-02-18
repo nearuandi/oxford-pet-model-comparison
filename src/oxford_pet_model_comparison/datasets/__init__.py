@@ -1,7 +1,7 @@
-from .dataloaders import build_dataloaders
-from .transforms import build_transforms
+from .datamodule import build_datamodule
+from .transforms import build_eval_transform
 
 __all__ = [
-    "build_dataloaders",
-    "build_transforms"
+    "build_datamodule",
+    "build_eval_transform"
 ]
