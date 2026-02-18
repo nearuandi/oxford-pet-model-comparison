@@ -12,9 +12,7 @@ def build_model(
     pretrained: bool = True,
     freeze_backbone: bool = False,
 ) -> nn.Module:
-
     model_name = model_name.lower()
-
 
     if model_name == "simple_cnn":
         return build_simple_cnn(num_classes=num_classes)
