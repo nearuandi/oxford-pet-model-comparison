@@ -38,5 +38,6 @@ def run_eval(cfg) -> None:
             loss_fn=loss_fn,
             device=device
         )
+    print(f"cfg.model.name: {cfg.model.name}")
     print(f"cfg.exp.name= {cfg.exp.name}")
     print(f"val_loss={val_loss:.4f} | val_acc={val_acc:.2f}%")
