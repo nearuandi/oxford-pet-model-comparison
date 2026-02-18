@@ -1,35 +1,29 @@
-import torch
-from torchvision.transforms import v2
+from torchvision.transforms import v2 as T
 from omegaconf import DictConfig
+import torch
 
-
-def build_transforms(
+def build_train_transform(
         cfg: DictConfig
-) -> tuple[v2.Compose, v2.Compose]:
-
+) -> T.Compose:
     dataset = cfg.dataset
-
-    train_transform = v2.Compose([
-        v2.ToImage(),
-        v2.RandomResizedCrop(dataset.image_size, scale=(0.8, 1.0)),
-        v2.RandomHorizontalFlip(p=0.5),
-        v2.ColorJitter(0.2, 0.2, 0.2, 0.02),
-        v2.ToDtype(torch.float32, scale=True),
-        v2.Normalize(
-            mean=dataset.image_mean,
-            std=dataset.image_std
-        ),
+    return T.Compose([
+        T.ToImage(),
+        T.Resize((dataset.image_size, dataset.image_size)),
+        T.RandomHorizontalFlip(p=0.5),
+        T.RandomVerticalFlip(p=0.1),
+        T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02),
+        T.ToDtype(torch.float32, scale=True),
+        T.Normalize(mean=dataset.mean, std=dataset.std),
     ])
 
-    eval_transform = v2.Compose([
-        v2.ToImage(),
-        v2.Resize(256),
-        v2.CenterCrop(dataset.image_size),
-        v2.ToDtype(torch.float32, scale=True),
-        v2.Normalize(
-            mean=dataset.image_mean,
-            std=dataset.image_std
-        ),
-    ])
 
-    return train_transform, eval_transform
+def build_eval_transform(
+        cfg: DictConfig
+) -> T.Compose:
+    dataset = cfg.dataset
+    return T.Compose([
+        T.ToImage(),
+        T.Resize((dataset.image_size, dataset.image_size)),
+        T.ToDtype(torch.float32, scale=True),
+        T.Normalize(mean=dataset.mean, std=dataset.std),
+    ])
