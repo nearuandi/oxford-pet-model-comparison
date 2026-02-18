@@ -55,6 +55,8 @@ class Trainer:
         }
 
         print(f"{self.cfg.exp.name} 훈련 시작")
+        print(f"pretrained: {self.cfg.model.pretrained}")
+        print(f"freeze_backbone: {self.cfg.model.freeze_backbone}")
 
         best_val_acc = 0.0
         start_time = time.time()
