@@ -4,7 +4,7 @@ from omegaconf import DictConfig
 
 from oxford_pet_model_comparison.models import build_model
 from oxford_pet_model_comparison.utils import load_image
-from oxford_pet_model_comparison.data import build_eval_transform
+from oxford_pet_model_comparison.datasets import build_eval_transform
 
 
 class Predictor:

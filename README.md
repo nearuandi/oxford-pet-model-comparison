@@ -11,8 +11,8 @@ pip install -e .
 
 ## Data Setup
 ```bash
-kaggle data download julinmaloof/the-oxfordiiit-pet-dataset
-Expand-Archive the-oxfordiiit-pet-dataset.zip -DestinationPath data/oxford-iiit-pet
+kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset
+Expand-Archive the-oxfordiiit-pet-dataset.zip -DestinationPath datasets/oxford-iiit-pet
 ```
 경로는 configs/dataset/oxford_pet.yaml에서 변경할 수 있습니다.
 

@@ -4,7 +4,7 @@ import torch
 from oxford_pet_model_comparison.utils import seed_everything
 from oxford_pet_model_comparison.engine import Trainer
 from oxford_pet_model_comparison.models import build_model
-from oxford_pet_model_comparison.data import build_datamodule
+from oxford_pet_model_comparison.datasets import build_datamodule
 from oxford_pet_model_comparison.utils import ensure_dir
 
 
