@@ -55,13 +55,13 @@ validation 기준으로 저장된 `best.pt`를 사용해 평가합니다.
 로컬 이미지:
 
 ```bash
-python scripts/predict.py image_path="cat.jpg"
+python scripts/infer.py image_path="cat.jpg"
 ```
 
 URL 이미지:
 
 ```bash
-python scripts/predict.py image_path="https://..."
+python scripts/infer.py image_path="https://..."
 ```
 
 출력 예시:
