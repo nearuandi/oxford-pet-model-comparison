@@ -1,7 +1,7 @@
 from pathlib import Path
 import torch
 
-from oxford_pet_model_comparison.inference import Predictor
+from oxford_pet_model_comparison.pipelines import Predictor
 
 
 def run_predict(cfg) -> None:
