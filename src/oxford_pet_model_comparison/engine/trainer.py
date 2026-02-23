@@ -29,45 +29,45 @@ class Trainer:
 
         self.optimizer = AdamW(
             params=self.model.parameters(),
-            lr=float(self.train.optimizer.lr),
-            weight_decay=float(self.train.optimizer.weight_decay),
-            betas=tuple(self.train.optimizer.betas) if "betas" in self.train.optimizer else (0.9, 0.999),
+            lr=self.train.optimizer.lr,
+            weight_decay=self.train.optimizer.weight_decay,
+            betas=self.train.optimizer.betas
         )
 
-        self.amp_enabled = bool(self.train.amp) and device.type == "cuda"
+        self.amp_enabled = self.train.amp and device.type == "cuda"
         self.scaler = GradScaler(enabled=self.amp_enabled)
 
         self.scheduler = ReduceLROnPlateau(
             self.optimizer,
             mode=self.train.scheduler.mode,
-            factor=float(self.train.scheduler.factor),
-            patience=int(self.train.scheduler.patience),
-            min_lr=float(self.train.scheduler.min_lr),
-            threshold=float(self.train.scheduler.threshold) if "threshold" in self.train.scheduler else 1e-4,
+            factor=self.train.scheduler.factor,
+            patience=self.train.scheduler.patience,
+            min_lr=self.train.scheduler.min_lr,
+            threshold=self.train.scheduler.threshold
         )
 
-        self.keep_last = bool(self.train.save.keep_last)
+        self.keep_last = self.train.save.keep_last
 
         self.best_metric = "val_acc"
         self.best_score = float("-inf")  # 0~1
 
-    def _make_best_payload(self, *, epoch: int) -> dict:
+    def _make_best_payload(self, epoch: int) -> dict:
         return {
-            "epoch": int(epoch),
+            "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
-            "best_score": float(self.best_score),
-            "best_metric": str(self.best_metric),
+            "best_score": self.best_score,
+            "best_metric": self.best_metric,
         }
 
-    def _make_last_payload(self, *, epoch: int) -> dict:
+    def _make_last_payload(self, epoch: int) -> dict:
         return {
-            "epoch": int(epoch),
+            "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
             "scheduler_state_dict": self.scheduler.state_dict(),
             "scaler_state_dict": self.scaler.state_dict() if self.scaler.is_enabled() else None,
-            "best_score": float(self.best_score),
-            "best_metric": str(self.best_metric),
+            "best_score": self.best_score,
+            "best_metric": self.best_metric
         }
 
     def fit(self, out_dir: str | Path, train_loader, val_loader) -> None:
@@ -75,7 +75,7 @@ class Trainer:
         ensure_dir(out_dir)
         save_config(out_dir / "config.yaml", self.cfg)
 
-        history: dict[str, list[float]] = {
+        history = {
             "train_loss": [],
             "train_acc": [],  # 0~100
             "val_loss": [],
@@ -106,21 +106,21 @@ class Trainer:
                 amp=self.amp_enabled,
             )
 
-            self.scheduler.step(float(val_loss))
+            self.scheduler.step(val_loss)
 
-            history["train_loss"].append(float(train_loss))
-            history["train_acc"].append(float(train_acc))
-            history["val_loss"].append(float(val_loss))
-            history["val_acc"].append(float(val_acc))
+            history["train_loss"].append(train_loss)
+            history["train_acc"].append(train_acc)
+            history["val_loss"].append(val_loss)
+            history["val_acc"].append(val_acc)
 
             print(
-                f"[Epoch {epoch:02d}/{int(self.train.num_epochs)}] {self.cfg.exp.name} | "
-                f"Train: Loss {float(train_loss):.4f}, Acc {float(train_acc):.2f}% | "
-                f"Val: Loss {float(val_loss):.4f}, Acc {float(val_acc):.2f}%"
+                f"[Epoch {epoch:02d}/{self.train.num_epochs}] {self.cfg.exp.name} | "
+                f"Train: Loss {train_loss:.4f}, Acc {train_acc:.2f}% | "
+                f"Val: Loss {val_loss:.4f}, Acc {val_acc:.2f}%"
             )
 
             # best_score는 0~1 스케일로 통일
-            score = float(val_acc) / 100.0
+            score = val_acc / 100.0
             if score > self.best_score:
                 self.best_score = score
                 payload = self._make_best_payload(epoch=epoch)
