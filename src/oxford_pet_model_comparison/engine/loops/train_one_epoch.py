@@ -15,24 +15,21 @@ def train_one_epoch(
 
     model.train()
 
-    running_loss = 0.0
-    num_correct = 0
-    num_samples = 0
+    sum_loss = 0.0
+    sum_correct = 0
+    sum_count = 0
 
     use_amp = (device.type == "cuda")
 
     for batch in train_loader:
-        images = batch["image"]
-        labels = batch["label"]
-
-        images = images.to(device, non_blocking=True)
-        labels = labels.to(device, non_blocking=True)
+        x = batch["image"].to(device, non_blocking=True)
+        y = batch["label"].to(device, non_blocking=True)
 
         optimizer.zero_grad(set_to_none=True)
 
         with autocast(device_type=device.type, enabled=use_amp):
-            logits = model(images)
-            loss = loss_fn(logits, labels)
+            logits = model(x)
+            loss = loss_fn(logits, y)
 
         if use_amp:
             scaler.scale(loss).backward()
@@ -42,14 +39,14 @@ def train_one_epoch(
             loss.backward()
             optimizer.step()
 
-        batch_size = labels.size(dim=0)
-        running_loss += loss.item() * batch_size
+        bs = y.size(dim=0)
+        sum_loss += loss.item() * bs
+        sum_count += bs
 
         preds = logits.argmax(dim=1)
-        num_correct += preds.eq(labels).sum().item()
-        num_samples += batch_size
+        sum_correct += preds.eq(y).sum().item()
 
-    train_loss = running_loss / max(num_samples, 1)
-    train_acc = 100.0 * num_correct / max(num_samples, 1)
+    train_loss = sum_loss / max(1, sum_count)
+    train_acc = 100.0 * sum_correct / max(1, sum_count)
 
     return train_loss, train_acc
