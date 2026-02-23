@@ -51,6 +51,21 @@ class Trainer:
         self.best_metric = "val_acc"
         self.best_score = float("-inf")  # 0~1
 
+    def _make_payload(
+            self,
+            *,
+            epoch: int
+    ) -> dict:
+        return {
+            "epoch": int(epoch),
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "scheduler_state_dict": self.scheduler.state_dict(),
+            "scaler_state_dict": self.scaler.state_dict() if self.scaler.is_enabled() else None,
+            "best_score": float(self.best_score),
+            "best_metric": str(self.best_metric),
+        }
+
     def fit(self, out_dir: str | Path, train_loader, val_loader) -> None:
         out_dir = Path(out_dir)
         ensure_dir(out_dir)
@@ -104,38 +119,12 @@ class Trainer:
             score = float(val_acc) / 100.0
             if score > self.best_score:
                 self.best_score = score
-                payload = {
-                    "epoch": epoch,
-                    "model_state_dict": self.model.state_dict(),
-                    "optimizer_state_dict": self.optimizer.state_dict(),
-                    "scaler_state_dict": self.scaler.state_dict() if self.scaler.is_enabled() else None,
-                    "best_score": float(self.best_score),
-                    "best_metric": self.best_metric,
-                    "metrics": {
-                        "train_loss": float(train_loss),
-                        "train_acc": float(train_acc),  # 0~100
-                        "val_loss": float(val_loss),
-                        "val_acc": float(val_acc),      # 0~100
-                    },
-                }
+                payload = self._make_payload(epoch=epoch)
                 save_checkpoint(out_dir / "best.pt", payload)
                 print(f"Best Updated: {self.best_metric}={self.best_score * 100:.2f}%")
 
             if self.keep_last:
-                payload = {
-                    "epoch": epoch,
-                    "model_state_dict": self.model.state_dict(),
-                    "optimizer_state_dict": self.optimizer.state_dict(),
-                    "scaler_state_dict": self.scaler.state_dict() if self.scaler.is_enabled() else None,
-                    "best_score": float(self.best_score),
-                    "best_metric": self.best_metric,
-                    "metrics": {
-                        "train_loss": float(train_loss),
-                        "train_acc": float(train_acc),  # 0~100
-                        "val_loss": float(val_loss),
-                        "val_acc": float(val_acc),      # 0~100
-                    },
-                }
+                payload = self._make_payload(epoch=epoch)
                 save_checkpoint(out_dir / "last.pt", payload)
 
         train_time = time.time() - start_time
