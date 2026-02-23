@@ -10,7 +10,8 @@ def train_one_epoch(
         loss_fn: nn.Module,
         device: torch.device,
         optimizer: Optimizer,
-        scaler: GradScaler
+        scaler: GradScaler,
+        amp: bool = True
 ) -> tuple[float, float]:
 
     model.train()
@@ -19,7 +20,8 @@ def train_one_epoch(
     sum_correct = 0
     sum_count = 0
 
-    use_amp = (device.type == "cuda")
+    use_autocast = bool(amp) and (device.type == "cuda")
+    use_scaler = use_autocast and (scaler is not None)
 
     for batch in train_loader:
         x = batch["image"].to(device, non_blocking=True)
@@ -27,11 +29,11 @@ def train_one_epoch(
 
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast(device_type=device.type, enabled=use_amp):
+        with autocast(device_type=device.type, enabled=use_autocast):
             logits = model(x)
             loss = loss_fn(logits, y)
 
-        if use_amp:
+        if use_scaler:
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()

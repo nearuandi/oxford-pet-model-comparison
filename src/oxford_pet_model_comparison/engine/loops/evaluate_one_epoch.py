@@ -8,22 +8,23 @@ def evaluate_one_epoch(
         model: nn.Module,
         val_loader: DataLoader,
         loss_fn: nn.Module,
-        device: torch.device
+        device: torch.device,
+        amp: bool = True
 ) -> tuple[float, float]:
 
     model.eval()
+
+    use_autocast = bool(amp) and (device.type == "cuda")
 
     sum_loss = 0.0
     sum_correct = 0
     sum_count = 0
 
-    use_amp = (device.type == "cuda")
-
     for batch in val_loader:
         x = batch["image"].to(device, non_blocking=True)
         y = batch["label"].to(device, non_blocking=True)
 
-        with autocast(device_type=device.type, enabled=use_amp):
+        with autocast(device_type=device.type, enabled=use_autocast):
             logits = model(x)
             loss = loss_fn(logits, y)
 

@@ -15,6 +15,12 @@ def run_eval(cfg) -> None:
     # dict 형태로 저장했으니까 weights_only=False
     payload = torch.load(best_path, map_location=device, weights_only=False)
 
+    best_epoch = payload.get("epoch")
+    best_metric = payload.get("best_metric")
+    best_score = payload.get("best_score")
+
+    print(f"[BEST] epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
+
     # 이미 trained weight 있어서 pretrained 의미 없음
     # freeze 는 학습할때만 필요
     model = build_model(

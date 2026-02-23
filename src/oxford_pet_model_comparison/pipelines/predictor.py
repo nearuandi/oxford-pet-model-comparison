@@ -20,6 +20,12 @@ class Predictor:
         # dict 형태로 저장했으니까 weights_only=False
         payload = torch.load(best_path, map_location=device, weights_only=False)
 
+        best_epoch = int(payload.get("epoch"))
+        best_metric = payload.get("best_metric")
+        best_score = payload.get("best_score")
+
+        print(f"[BEST] epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
+
         self.model = build_model(
             model_name=cfg.model.name,
             num_classes=cfg.dataset.num_classes,
