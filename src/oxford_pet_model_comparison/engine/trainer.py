@@ -51,7 +51,7 @@ class Trainer:
         self.best_metric = "val_acc"
         self.best_score = float("-inf")  # 0~1
 
-    def _make_best_payload(self, epoch: int) -> dict:
+    def _make_best_ckpt(self, epoch: int) -> dict:
         return {
             "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
@@ -59,7 +59,7 @@ class Trainer:
             "best_metric": self.best_metric,
         }
 
-    def _make_last_payload(self, epoch: int) -> dict:
+    def _make_last_ckpt(self, epoch: int) -> dict:
         return {
             "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
@@ -123,13 +123,13 @@ class Trainer:
             score = val_acc / 100.0
             if score > self.best_score:
                 self.best_score = score
-                payload = self._make_best_payload(epoch=epoch)
-                save_checkpoint(out_dir / "best.pt", payload)
+                ckpt = self._make_best_ckpt(epoch=epoch)
+                save_checkpoint(out_dir / "best.pt", ckpt)
                 print(f"Best Updated: {self.best_metric}={self.best_score * 100:.2f}%")
 
             if self.keep_last:
-                payload = self._make_last_payload(epoch=epoch)
-                save_checkpoint(out_dir / "last.pt", payload)
+                ckpt = self._make_last_ckpt(epoch=epoch)
+                save_checkpoint(out_dir / "last.pt", ckpt)
 
         train_time = time.time() - start_time
         save_history(

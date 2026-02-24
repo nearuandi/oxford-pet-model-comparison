@@ -11,20 +11,11 @@ class Predictor:
     def __init__(
             self,
             cfg: DictConfig,
-            best_path: str | Path,
+            ckpt: dict,
             device: torch.device
     ):
         self.cfg = cfg
         self.device = device
-
-        # dict 형태로 저장했으니까 weights_only=False
-        payload = torch.load(best_path, map_location=device, weights_only=False)
-
-        best_epoch = int(payload.get("epoch"))
-        best_metric = payload.get("best_metric")
-        best_score = payload.get("best_score")
-
-        print(f"[BEST] epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
 
         self.model = build_model(
             model_name=cfg.model.name,
@@ -34,8 +25,9 @@ class Predictor:
         )
         self.model.to(self.device)
 
-        self.model.load_state_dict(payload["model_state_dict"])
+        self.model.load_state_dict(ckpt["model_state_dict"])
         self.model.eval()
+        self.dataset= cfg.dataset
 
         self.transform = build_eval_transform(cfg)
 
@@ -50,6 +42,6 @@ class Predictor:
 
         return {
             "class_id": idx,
-            "class_name": self.cfg.dataset.class_names[idx],
+            "class_name": self.dataset.class_names[idx],
             "prob": float(prob[idx].item()),
         }

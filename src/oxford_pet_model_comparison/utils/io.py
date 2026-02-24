@@ -12,8 +12,8 @@ def save_config(path: str | Path, cfg) -> None:
     path = Path(path)
     path.write_text(OmegaConf.to_yaml(cfg), encoding="utf-8")
 
-def save_checkpoint(path: Path, payload: dict) -> None:
-    torch.save(payload, path)
+def save_checkpoint(path: Path, ckpt: dict) -> None:
+    torch.save(ckpt, path)
 
 def save_history(
         out_dir: str | Path,

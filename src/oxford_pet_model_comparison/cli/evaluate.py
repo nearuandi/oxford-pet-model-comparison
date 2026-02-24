@@ -13,13 +13,11 @@ def run_eval(cfg) -> None:
     best_path = out_dir / "best.pt"
 
     # dict 형태로 저장했으니까 weights_only=False
-    payload = torch.load(best_path, map_location=device, weights_only=False)
+    ckpt = torch.load(best_path, map_location=device, weights_only=False)
 
-    best_epoch = payload.get("epoch")
-    best_metric = payload.get("best_metric")
-    best_score = payload.get("best_score")
-
-    print(f"[BEST] epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
+    best_epoch = ckpt.get("epoch")
+    best_metric = ckpt.get("best_metric")
+    best_score = ckpt.get("best_score")
 
     # 이미 trained weight 있어서 pretrained 의미 없음
     # freeze 는 학습할때만 필요
@@ -31,7 +29,7 @@ def run_eval(cfg) -> None:
     )
     model.to(device)
 
-    model.load_state_dict(payload["model_state_dict"])
+    model.load_state_dict(ckpt["model_state_dict"])
 
     datamodule = build_datamodule(cfg)
     loss_fn = nn.CrossEntropyLoss()
@@ -46,4 +44,5 @@ def run_eval(cfg) -> None:
         )
     print(f"cfg.model.name: {cfg.model.name}")
     print(f"cfg.exp.name= {cfg.exp.name}")
+    print(f"BEST epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
     print(f"val_loss={val_loss:.4f} | val_acc={val_acc:.2f}%")
