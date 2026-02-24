@@ -8,4 +8,4 @@ defaults:
 
 seed: 42
 
-image_path: null
+image_path: "sample.jpg"
