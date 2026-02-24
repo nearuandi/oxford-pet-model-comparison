@@ -55,7 +55,7 @@ validation 기준으로 저장된 `best.pt`를 사용해 평가합니다.
 로컬 이미지:
 
 ```bash
-python scripts/infer.py image_path="cat.jpg"
+python scripts/infer.py image_path="sample.jpg"
 ```
 
 URL 이미지:
@@ -69,9 +69,10 @@ python scripts/infer.py image_path="https://..."
 ```
 cfg.model.name=resnet18
 cfg.exp.name=resnet18
+BEST epoch=19 | best_metric=val_acc | best_score=90.49
 class_id=0
 class_name=Abyssinian
-prob=99.72%
+prob=99.76%
 ```
 
 ---
