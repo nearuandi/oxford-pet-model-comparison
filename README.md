@@ -8,7 +8,6 @@ Hydra 기반 설정을 사용해 여러 CNN 모델(SimpleCNN, MobileNetV2, ResNe
 ---
 
 ## Install
-
 ```bash
 pip install -e .
 ```
@@ -16,10 +15,8 @@ pip install -e .
 ---
 
 ## Dataset
-
 ```bash
-kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset
-Expand-Archive the-oxfordiiit-pet-dataset.zip -DestinationPath datasets/oxford-iiit-pet
+kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset -p datasets/oxford-iiit-pet --unzip
 ```
 
 ---
