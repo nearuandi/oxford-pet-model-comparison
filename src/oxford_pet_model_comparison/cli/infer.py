@@ -9,7 +9,7 @@ def run_infer(cfg) -> None:
     out_dir = Path(cfg.paths.out_dir) / cfg.exp.name
     best_path = out_dir / "best.pt"
 
-    ckpt = torch.load(best_path, map_location=device, weights_only=False)
+    ckpt = torch.load(best_path, map_location=device, weights_only=True)
 
     best_epoch = ckpt.get("epoch")
     best_metric = ckpt.get("best_metric")

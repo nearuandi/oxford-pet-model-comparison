@@ -13,7 +13,7 @@ def run_eval(cfg) -> None:
     best_path = out_dir / "best.pt"
 
     # dict 형태로 저장했으니까 weights_only=False
-    ckpt = torch.load(best_path, map_location=device, weights_only=False)
+    ckpt = torch.load(best_path, map_location=device, weights_only=True)
 
     best_epoch = ckpt.get("epoch")
     best_metric = ckpt.get("best_metric")
