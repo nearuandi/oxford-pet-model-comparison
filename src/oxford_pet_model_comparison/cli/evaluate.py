@@ -12,7 +12,6 @@ def run_eval(cfg) -> None:
     out_dir = Path(cfg.paths.out_dir) / cfg.exp.name
     best_path = out_dir / "best.pt"
 
-    # dict 형태로 저장했으니까 weights_only=False
     ckpt = torch.load(best_path, map_location=device, weights_only=True)
 
     best_epoch = ckpt.get("epoch")

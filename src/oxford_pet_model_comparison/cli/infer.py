@@ -22,7 +22,7 @@ def run_infer(cfg) -> None:
 
     print(f"모델명={cfg.model.name}\n"
           f"실험명={cfg.exp.name}")
-    print(f"최고 성능={best_epoch:02d} epoch | 기준 지표: 검증 정확도 | 점수={best_score * 100:.2f}%")
+    print(f"최고 성능={best_epoch:02d} epoch | 기준 지표: {best_metric} | 점수={best_score * 100:.2f}%")
     print(f"예측 번호={result['class_id']}\n"
           f"예측 품종={result['class_name']}\n"
-          f"정확도={result['prob']*100:.2f}%")
+          f"신뢰도={result['prob']*100:.2f}%")
