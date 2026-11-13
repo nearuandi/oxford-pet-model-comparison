@@ -20,9 +20,9 @@ def run_infer(cfg) -> None:
     predictor = Predictor(cfg, ckpt=ckpt, device=device)
     result = predictor.predict(image_path_or_url=image_path)
 
-    print(f"cfg.model.name={cfg.model.name}\n"
-          f"cfg.exp.name={cfg.exp.name}")
-    print(f"BEST epoch={best_epoch:02d} | best_metric={best_metric} | best_score={best_score * 100:.2f}")
-    print(f"class_id={result['class_id']}\n"
-          f"class_name={result['class_name']}\n"
-          f"prob={result['prob']*100:.2f}%")
+    print(f"모델명={cfg.model.name}\n"
+          f"실험명={cfg.exp.name}")
+    print(f"최고 성능={best_epoch:02d} epoch | 기준 지표: 검증 정확도 | 점수={best_score * 100:.2f}%")
+    print(f"예측 번호={result['class_id']}\n"
+          f"예측 품종={result['class_name']}\n"
+          f"정확도={result['prob']*100:.2f}%")
