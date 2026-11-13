@@ -9,23 +9,17 @@ std:  [0.229, 0.224, 0.225]
 
 class_names:
   - Abyssinian
-  - Bengal
-  - Birman
-  - Bombay
-  - British_Shorthair
-  - Egyptian_Mau
-  - Maine_Coon
-  - Persian
-  - Ragdoll
-  - Russian_Blue
-  - Siamese
-  - Sphynx
   - American_Bulldog
   - American_Pit_Bull_Terrier
   - Basset_Hound
   - Beagle
+  - Bengal
+  - Birman
+  - Bombay
   - Boxer
+  - British_Shorthair
   - Chihuahua
+  - Egyptian_Mau
   - English_Cocker_Spaniel
   - English_Setter
   - German_Shorthaired
@@ -34,14 +28,20 @@ class_names:
   - Japanese_Chin
   - Keeshond
   - Leonberger
+  - Maine_Coon
   - Miniature_Pinscher
   - Newfoundland
+  - Persian
   - Pomeranian
   - Pug
+  - Ragdoll
+  - Russian_Blue
   - Saint_Bernard
   - Samoyed
   - Scottish_Terrier
   - Shiba_Inu
+  - Siamese
+  - Sphynx
   - Staffordshire_Bull_Terrier
   - Wheaten_Terrier
   - Yorkshire_Terrier
