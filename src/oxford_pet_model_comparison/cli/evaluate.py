@@ -38,7 +38,7 @@ def run_eval(cfg) -> None:
     with torch.inference_mode():
         val_loss, val_acc = evaluate_one_epoch(
             model=model,
-            val_loader=datamodule.val_loader,
+            val_loader=datamodule.test_loader,
             loss_fn=loss_fn,
             device=device
         )

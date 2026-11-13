@@ -11,6 +11,7 @@ from .oxford_pet_dataset import OxfordPetDataset
 class DataModule:
     train_loader: DataLoader
     val_loader: DataLoader
+    test_loader: DataLoader
 
 
 def split_indices(
@@ -85,5 +86,18 @@ def build_datamodule(cfg: DictConfig) -> DataModule:
         persistent_workers=train.persistent_workers,
         drop_last=False,
     )
+    test_dataset = OxfordPetDataset(
+        root=dataset.root, split="test",
+        transform=eval_transform, download=False,
+    )
+    test_loader = DataLoader(
+        dataset=test_dataset,
+        batch_size=train.batch_size,
+        shuffle=False,
+        num_workers=train.num_workers,
+        pin_memory=train.pin_memory,
+        persistent_workers=train.persistent_workers and train.num_workers > 0,
+        drop_last=False,
+    )
 
-    return DataModule(train_loader=train_loader, val_loader=val_loader)
+    return DataModule(train_loader=train_loader, val_loader=val_loader, test_loader=test_loader)
