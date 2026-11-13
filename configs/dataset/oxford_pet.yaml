@@ -1,5 +1,5 @@
 name: oxford_pet
-root: data
+root: datasets
 train_ratio: 0.9
 num_classes: 37
 

@@ -16,7 +16,7 @@ pip install -e .
 
 ## Dataset
 ```bash
-kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset -p data/oxford-iiit-pet --unzip
+kaggle datasets download julinmaloof/the-oxfordiiit-pet-dataset -p datasets/oxford-iiit-pet --unzip
 ```
 
 ---
